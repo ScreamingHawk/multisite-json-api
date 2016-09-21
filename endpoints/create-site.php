@@ -44,6 +44,13 @@ if(isset($api->json->title) && isset($api->json->email) && isset($api->json->sit
 				$api->error("invalid_site_title", "Invalid site title '" . $api->json->title . "'");
 				die();
 			}
+			// Store id valid (OPTIONAL)
+			if (isset($api->json->store_id)){
+				if (!$api->is_valid_store_id($api->json->store_id)) {
+					$api->error("invalid_store_id", "Invalid store id '" . $api->json->store_id . "'");
+					die();
+				}
+			}
 
 			// Start creating stuff
 			try {
@@ -59,6 +66,28 @@ if(isset($api->json->title) && isset($api->json->email) && isset($api->json->sit
 			} catch(MultiSite_JSON_API\SiteCreationException $e) {
 				$api->json_exception($e);
 				die();
+			}
+			// Custom table for mapping sites to external information (OPTIONAL)
+			if (isset($api->json->store_id)){
+				try {
+					$store_id = (int)$api->json->store_id;
+					
+					$sql = "CREATE TABLE IF NOT EXISTS store_wp_site_mapping (
+							store_id BIGINT NOT NULL UNIQUE,
+							site_id BIGINT NOT NULL UNIQUE);";
+					require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+					dbDelta($sql);
+
+					$wpdb->insert( 
+						'store_wp_site_mapping', 
+						array('store_id' => $store_id,'site_id' => $site->blog_id), 
+						array('%d', '%d') 
+					);
+					$site->store_id = $store_id;
+				} catch(MultiSite_JSON_API\SiteCreationException $e) {
+					$api->json_exception($e);
+					die();
+				}
 			}
 			$api->send_site_creation_notifications($site->blog_id, $api->json->email);
 			$api->respond_with_json($site, 201);

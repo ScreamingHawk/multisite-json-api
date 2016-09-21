@@ -103,6 +103,20 @@ class Endpoint {
 	}
 
 	/*
+	 * Validates that the store id is an int
+	 * Note: This field is for mapping wordpress sites to external functions and is not required
+	 * @since '1.0.1'
+	 */
+	public function is_valid_store_id($candidate) {
+		try {
+			(int)$candidate;
+		} catch (Exception $e){
+			return false;
+		}
+		return true;
+	}
+
+	/*
 	 * Validates emails via the wordpress functions.
 	 * @since '0.0.1'
 	 * @param email_address
