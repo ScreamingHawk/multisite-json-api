@@ -40,6 +40,14 @@ if($user) {
 			"archived" => $archived,
 			"deleted" => $deleted
 		));
+		try {
+			// Get the store id from the mapping table
+			foreach ($sites as &$site){
+				$site->store_id = (int)$wpdb->get_var($wpdb->prepare("SELECT store_id FROM store_wp_site_mapping WHERE site_id = %d", $site->blog_id));
+			}
+		} catch (Exception $e){
+			//Must bnot be used. Ignore.
+		}
 		$fixed = $api->fix_site_values($sites);
 		$api->respond_with_json($fixed, 200);
 	}
