@@ -46,7 +46,7 @@ if($user) {
 				$site->store_id = (int)$wpdb->get_var($wpdb->prepare("SELECT store_id FROM store_wp_site_mapping WHERE site_id = %d", $site->blog_id));
 			}
 		} catch (Exception $e){
-			//Must bnot be used. Ignore.
+			//Must not be used. Ignore.
 		}
 		$fixed = $api->fix_site_values($sites);
 		$api->respond_with_json($fixed, 200);
