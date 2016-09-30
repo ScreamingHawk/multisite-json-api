@@ -84,6 +84,14 @@ if(isset($api->json->title) && isset($api->json->email) && isset($api->json->sit
 						array('%d', '%d') 
 					);
 					$site->store_id = $store_id;
+					
+					// Create index
+					$wp_db_prefix = 'wp_';
+					if ($site->blog_id > 1){
+						$wp_db_prefix .= $site->blog_id + '_';
+					}
+					$sql = "CREATE INDEX "+$wp_db_prefix+"_posts_idx_1 ON "+$wp_db_prefix+"_posts (post_password);";
+					dbDelta($sql);
 				} catch(MultiSite_JSON_API\SiteCreationException $e) {
 					$api->json_exception($e);
 					die();
