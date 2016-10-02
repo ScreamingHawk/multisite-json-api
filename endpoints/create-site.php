@@ -1,5 +1,7 @@
 <?php
 
+set_time_limit(0);
+
 include_once('../includes/boot.php');
 include_once('../includes/class-endpoint.php');
 
@@ -77,7 +79,7 @@ if(isset($api->json->title) && isset($api->json->email) && isset($api->json->sit
 							site_id BIGINT NOT NULL UNIQUE);";
 					require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
 					dbDelta($sql);
-
+					
 					$wpdb->insert( 
 						'store_wp_site_mapping', 
 						array('store_id' => $store_id,'site_id' => $site->blog_id), 
@@ -86,12 +88,13 @@ if(isset($api->json->title) && isset($api->json->email) && isset($api->json->sit
 					$site->store_id = $store_id;
 					
 					// Create index
-					$wp_db_prefix = 'wp_';
+					$wp_db_prefix = 'wp';
 					if ($site->blog_id > 1){
-						$wp_db_prefix .= $site->blog_id + '_';
+						$wp_db_prefix .= '_' . $site->blog_id;
 					}
-					$sql = "CREATE INDEX "+$wp_db_prefix+"_posts_idx_1 ON "+$wp_db_prefix+"_posts (post_password);";
-					dbDelta($sql);
+					$sql = "CREATE INDEX " . $wp_db_prefix . "_posts_idx_1 ON " . $wp_db_prefix . "_posts (post_password);";
+					$wpdb->query($sql);
+					
 				} catch(MultiSite_JSON_API\SiteCreationException $e) {
 					$api->json_exception($e);
 					die();
