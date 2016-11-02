@@ -10,7 +10,7 @@ $api = new Multisite_JSON_API\Endpoint();
 $user = $api->authenticate();
 
 if($user) {
-	/*
+		/*
 	 * Make sure user has permissions to create sites
 	 */
 	if($api->user_can_create_sites()) {
@@ -34,7 +34,7 @@ if($user) {
 		if(isset($_GET['deleted']))
 			$deleted = $_GET['deleted'];
 
-		$sites = get_sites(array(
+		$sites = wp_get_sites(array(
 			"public" => $public,
 			"spam" => $spam,
 			"archived" => $archived,
@@ -56,3 +56,4 @@ if($user) {
 	die();
 }
 ?>
+
